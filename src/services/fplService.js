@@ -5,6 +5,7 @@ export class FPLService {
     this.baseURL = 'https://fantasy.premierleague.com/api';
     this.lastChecked = new Date();
     this.cache = new Map();
+    this.postedDeadlines = new Set(); // Track posted deadlines
   }
 
   async getBootstrapData() {
@@ -62,13 +63,19 @@ export class FPLService {
       const hoursUntilDeadline = (deadline - now) / (1000 * 60 * 60);
 
       if (hoursUntilDeadline > 0 && hoursUntilDeadline <= 3) {
-        updates.push({
-          type: 'deadline_reminder',
-          data: {
-            gameweek: currentGameweek,
-            hoursLeft: Math.round(hoursUntilDeadline)
-          }
-        });
+        const deadlineKey = `gw${currentGameweek.id}`;
+        
+        // Only post deadline once per gameweek
+        if (!this.postedDeadlines.has(deadlineKey)) {
+          this.postedDeadlines.add(deadlineKey);
+          updates.push({
+            type: 'deadline_reminder',
+            data: {
+              gameweek: currentGameweek,
+              hoursLeft: Math.round(hoursUntilDeadline)
+            }
+          });
+        }
       }
 
       // Check for daily price changes
