@@ -1,0 +1,22 @@
+{
+  "name": "fpl-status-bot",
+  "version": "1.0.0",
+  "description": "Automated Twitter bot for Fantasy Premier League status updates",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["fpl", "fantasy", "premier-league", "twitter", "bot", "automation"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "twitter-api-v2": "^1.17.2",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5",
+    "axios": "^1.7.7",
+    "express": "^4.19.2"
+  },
+  "type": "module"
+}
