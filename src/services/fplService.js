@@ -53,11 +53,17 @@ export class FPLService {
 
       if (todayFixtures.length > 0) {
         // Add team names to fixtures
-        const fixturesWithTeams = todayFixtures.map(fixture => ({
-          ...fixture,
-          team_h_short: this.getTeamName(fixture.team_h, bootstrap),
-          team_a_short: this.getTeamName(fixture.team_a, bootstrap)
-        }));
+        const fixturesWithTeams = todayFixtures.map(fixture => {
+          const homeTeam = this.getTeamName(fixture.team_h, bootstrap);
+          const awayTeam = this.getTeamName(fixture.team_a, bootstrap);
+          console.log(`Mapping: ${fixture.team_h} -> ${homeTeam}, ${fixture.team_a} -> ${awayTeam}`);
+          
+          return {
+            ...fixture,
+            team_h_short: homeTeam,
+            team_a_short: awayTeam
+          };
+        });
 
         updates.push({
           type: 'gameweek_fixtures',
