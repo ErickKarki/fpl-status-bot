@@ -30,7 +30,11 @@ export class FPLService {
 
   async getCurrentGameweek() {
     const bootstrap = await this.getBootstrapData();
-    return bootstrap.events.find(event => event.is_current);
+    const currentEvent = bootstrap.events.find(event => event.is_current);
+    const nextEvent = bootstrap.events.find(event => event.is_next);
+    
+    // Return current or next event with proper data
+    return currentEvent || nextEvent || bootstrap.events[0];
   }
 
   async getLatestUpdates() {
@@ -40,6 +44,7 @@ export class FPLService {
       const currentGameweek = await this.getCurrentGameweek();
       const fixtures = await this.getFixtures();
       
+      const bootstrap = await this.getBootstrapData();
       const todayFixtures = fixtures.filter(fixture => {
         const fixtureDate = new Date(fixture.kickoff_time);
         const today = new Date();
@@ -47,17 +52,23 @@ export class FPLService {
       });
 
       if (todayFixtures.length > 0) {
+        // Add team names to fixtures
+        const fixturesWithTeams = todayFixtures.map(fixture => ({
+          ...fixture,
+          team_h_short: this.getTeamName(fixture.team_h, bootstrap),
+          team_a_short: this.getTeamName(fixture.team_a, bootstrap)
+        }));
+
         updates.push({
           type: 'gameweek_fixtures',
           data: {
             gameweek: currentGameweek,
-            fixtures: todayFixtures
+            fixtures: fixturesWithTeams
           }
         });
       }
 
 
-      const bootstrap = await this.getBootstrapData();
       const deadline = new Date(currentGameweek?.deadline_time);
       const now = new Date();
       const hoursUntilDeadline = (deadline - now) / (1000 * 60 * 60);
