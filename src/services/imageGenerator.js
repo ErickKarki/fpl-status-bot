@@ -6,8 +6,8 @@ export class ImageGenerator {
     this.baseURL = 'https://htmlcsstoimage.com/demo_run';
   }
 
-  async generateFixtureCard(fixtures, gameweek) {
-    const html = this.createFixtureHTML(fixtures, gameweek);
+  async generateFixtureCard(fixtures, gameweek, bootstrap) {
+    const html = this.createFixtureHTML(fixtures, gameweek, bootstrap);
     const css = this.getFixtureCSS();
     
     try {
@@ -60,7 +60,7 @@ export class ImageGenerator {
     }
   }
 
-  createFixtureHTML(fixtures, gameweek) {
+  createFixtureHTML(fixtures, gameweek, bootstrap) {
     let fixtureList = '';
     fixtures.forEach(fixture => {
       const time = new Date(fixture.kickoff_time).toLocaleTimeString('en-GB', { 
@@ -68,13 +68,18 @@ export class ImageGenerator {
         minute: '2-digit',
         timeZone: 'UTC'
       });
+      
+      // Get team names from bootstrap data
+      const homeTeam = fixture.team_h_short || this.getTeamName(fixture.team_h, bootstrap);
+      const awayTeam = fixture.team_a_short || this.getTeamName(fixture.team_a, bootstrap);
+      
       fixtureList += `
         <div class="fixture">
           <span class="time">${time}</span>
           <div class="teams">
-            <span class="team home">${fixture.team_h_short || fixture.team_h}</span>
+            <span class="team home">${homeTeam}</span>
             <span class="vs">v</span>
-            <span class="team away">${fixture.team_a_short || fixture.team_a}</span>
+            <span class="team away">${awayTeam}</span>
           </div>
         </div>
       `;
@@ -96,6 +101,12 @@ export class ImageGenerator {
         </div>
       </div>
     `;
+  }
+
+  getTeamName(teamId, bootstrap) {
+    if (!bootstrap || !bootstrap.teams) return teamId;
+    const team = bootstrap.teams.find(t => t.id === teamId);
+    return team ? team.short_name : teamId;
   }
 
   createPriceChangeHTML(rises, falls) {

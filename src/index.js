@@ -44,9 +44,11 @@ async function checkAndPostUpdates() {
       try {
         switch (update.type) {
           case 'gameweek_fixtures':
+            const bootstrap = await fplService.getBootstrapData();
             imageUrl = await imageGenerator.generateFixtureCard(
               update.data.fixtures, 
-              update.data.gameweek
+              update.data.gameweek,
+              bootstrap
             );
             break;
           case 'price_changes':
